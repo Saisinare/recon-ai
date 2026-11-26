@@ -1,0 +1,9 @@
+pandas>=2.0
+rapidfuzz>=3.0
+requests>=2.31
+openpyxl>=3.1
+fastapi>=0.110
+uvicorn>=0.29
+python-multipart>=0.0.9
+# optional, for layer 3 embeddings:
+# sentence-transformers>=3.0

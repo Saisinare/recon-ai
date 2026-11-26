@@ -1,0 +1,36 @@
+id,date,party,doc_no,type,amount
+L001,2026-09-05,Kotak Logistics,INV-1001,invoice,55500.00
+L002,2026-09-04,Verma Textiles,INV-1002,invoice,51750.00
+L003,2026-09-03,Sharma Traders Pvt Ltd,INV-1003,invoice,60500.00
+L004,2026-09-18,Sharma Traders Pvt Ltd,INV-1004,invoice,59250.00
+L005,2026-09-19,Verma Textiles,INV-1005,invoice,55750.00
+L006,2026-09-18,Sharma Traders Pvt Ltd,INV-1006,invoice,22000.00
+L007,2026-09-04,Verma Textiles,INV-1007,invoice,78000.00
+L008,2026-09-19,Sharma Traders Pvt Ltd,INV-1008,invoice,86750.00
+L009,2026-09-23,Verma Textiles,INV-1009,invoice,13000.00
+L010,2026-09-16,Infosys Ltd,INV-1010,invoice,73000.00
+L011,2026-09-19,Bluestone Foods LLP,INV-1011,invoice,63000.00
+L012,2026-09-23,Infosys Ltd,INV-1012,invoice,36000.00
+L013,2026-09-26,Amazon Web Services,BILL-2201,bill,-18432.60
+L014,2026-09-27,Airtel Broadband,BILL-2202,bill,-3539.00
+L015,2026-09-28,BESCOM Electricity,BILL-2203,bill,-7260.00
+L016,2026-09-29,WeWork India,BILL-2204,bill,-54000.00
+L017,2026-09-12,Tata Consultancy Services,INV-1101,invoice,118000.00
+L018,2026-09-12,Bluestone Foods LLP,INV-1102,invoice,64250.50
+L019,2026-09-12,Verma Textiles,INV-1103,invoice,27775.25
+L020,2026-10-03,Amazon India,BILL-2207,bill,-2499.00
+L021,2026-10-02,Airtel Broadband,BILL-2208,bill,-2499.00
+L022,2026-09-20,Mehta & Sons,INV-1104,invoice,15000.00
+L023,2026-09-22,Sharma Traders Pvt Ltd,INV-1105,invoice,15000.00
+L024,2026-09-05,Reliance Retail Ltd,INV-1106,invoice,45000.00
+L025,2026-09-09,Reliance Retail Ltd,INV-1107,invoice,32500.00
+L026,2026-09-14,Reliance Retail Ltd,INV-1108,invoice,47000.00
+L027,2026-10-01,Reliance Retail Ltd,INV-1109,invoice,30000.00
+L028,2026-09-18,Infosys Ltd,INV-1110,invoice,22000.00
+L029,2026-09-19,Infosys Ltd,INV-1111,invoice,18500.00
+L030,2026-10-01,Stripe Payments India,INV-1112,invoice,25000.00
+L031,2026-10-02,Stripe Payments India,INV-1113,invoice,25000.00
+L032,2026-10-18,Stripe Payments India,INV-1114,invoice,18000.00
+L033,2026-09-25,Zomato Ltd,INV-1115,invoice,10000.00
+L034,2026-09-28,Kotak Logistics,INV-1117,invoice,12340.00
+L035,2026-10-20,Verma Textiles,INV-1116,invoice,8250.00
