@@ -1,77 +1,141 @@
-# Recon AI
+<div align="center">
 
-Bank-to-ledger reconciliation where **code does all the math, the LLM only reads messy text and
-judges unclear cases, and every correction you make becomes a reusable rule.**
+# 🟢 Recon AI
 
-## How it works
+### Reconcile your books without the guesswork.
+
+Bank-to-ledger reconciliation where **code does all the math**, an **LLM reads the messy text and judges the unclear cases**,
+and **every correction you make becomes a reusable rule**.
+
+![Python](https://img.shields.io/badge/Python-3.11+-1b3b22?style=flat-square&logo=python&logoColor=c8f169)
+![FastAPI](https://img.shields.io/badge/FastAPI-backend-1b3b22?style=flat-square&logo=fastapi&logoColor=c8f169)
+![React](https://img.shields.io/badge/React-Vite-1b3b22?style=flat-square&logo=react&logoColor=c8f169)
+![Groq](https://img.shields.io/badge/LLM-Groq%20·%20Gemini%20·%20Ollama-c8f169?style=flat-square)
+![Accuracy](https://img.shields.io/badge/sample%20set-27%2F27%20matched%20·%200%20wrong-c8f169?style=flat-square)
+
+<img src="docs/screenshots/02-hero-results.png" alt="Recon AI home screen with a finished run" width="100%" />
+
+</div>
+
+---
+
+## ✨ Why it's different
+
+Most "AI reconciliation" tools hand the whole job to an LLM, which is slow and costs money on every run.
+LLMs are also bad at adding numbers. Recon AI splits the work:
+
+| | |
+|---|---|
+| 🧮 **Exact math, always** | Amounts are integer paise. Matching sums, fees and differences are computed in code, never by the model. |
+| 🧠 **LLM only where it helps** | Reading `UPI/AMZN MKTP IN/…` as *Amazon*, and choosing between close candidates, with a written reason. |
+| 🔁 **Learns from you** | Approve a tricky match and it becomes a readable rule. Next month that case is matched automatically, with no LLM call. |
+| 🧾 **Audit-ready** | Every match, approval, rejection and rule change is logged with the layer, confidence and reason. |
+| 🔒 **Private option** | Run fully offline with Ollama. Without any LLM, it falls back to deterministic heuristics. |
+
+## 🏗️ How it works
 
 Each layer only sees what the earlier layers left open.
 
-| Layer | What it does | AI? |
-|---|---|---|
-| 0. Ingest | CSV/Excel to one schema, amounts as integer paise, duplicate lines set aside | no |
-| 1. Rules | invoice/bill numbers in the bank text, your learned rules, unique amounts | no |
-| 2. Extract | LLM turns `UPI/AMZN MKTP/...` into payee, invoice refs, kind (cached per description) | yes |
-| 3. Fuzzy names | same amount, different spelling (`AMZN` = Amazon, `TCS`, truncation) | optional local embeddings |
-| 4. Split solver | which open items add up exactly to one deposit; near-sums for fees/TDS | no |
-| 5. Judge | LLM picks between the remaining candidates, gives confidence and a reason | yes |
+```mermaid
+flowchart TD
+    A[Bank + ledger files<br/>CSV · Excel] --> B[Ingest & normalize<br/>integer paise · duplicates set aside]
+    B --> L1[1 · Exact & learned rules]
+    L1 --> L2[2 · LLM field extraction<br/>payee · invoice refs · kind]
+    L2 --> L3[3 · Fuzzy name match<br/>AMZN = Amazon, TCS, truncation]
+    L3 --> L4[4 · Split-payment solver<br/>subset sum, exact math]
+    L4 --> L5[5 · LLM judge<br/>confidence + reason]
+    L5 --> R[Review screen]
+    R -- correction --> RL[Rule learner]
+    RL -- approved rule --> L1
 
-- Anything below the auto-match threshold, and any match with a difference (fee, TDS), goes to **Needs review**.
-- **Approve and learn a rule** turns a correction into a pattern, party, date window and tolerance rule.
-  Activate it and it runs in layer 1 next time, so later months need fewer LLM calls and fewer reviews.
-- Every match, approval, rejection and rule change is written to the audit log (`recon.db`).
-- With provider `none`, everything still runs on regex and scoring heuristics.
+    classDef ai fill:#eaf9c8,stroke:#2c4a0c,color:#2c4a0c
+    classDef code fill:#1b3b22,stroke:#1b3b22,color:#c8f169
+    class L2,L5,RL ai
+    class L1,L3,L4 code
+```
 
-## Run it
+<sub>🟩 light = uses an LLM · ⬛ dark = pure code</sub>
+
+## 📸 Screenshots
+
+<table>
+<tr>
+<td width="50%"><b>Overview</b><br/><img src="docs/screenshots/03-overview.png" alt="Overview cards" /></td>
+<td width="50%"><b>Needs review</b>, with the LLM's reason on each card<br/><img src="docs/screenshots/04-review.png" alt="Review cards" /></td>
+</tr>
+<tr>
+<td><b>Matched</b>, with layer, confidence and reason<br/><img src="docs/screenshots/05-matched.png" alt="Matched table" /></td>
+<td><b>Unmatched</b>: match by hand, difference worked out for you<br/><img src="docs/screenshots/06-unmatched.png" alt="Unmatched items" /></td>
+</tr>
+<tr>
+<td><b>Rules learned from you</b><br/><img src="docs/screenshots/07-rules.png" alt="Learned rules" /></td>
+<td><b>Before a run</b><br/><img src="docs/screenshots/01-landing.png" alt="Landing" /></td>
+</tr>
+</table>
+
+## 📊 Results on the sample set
+
+`data/make_sample.py` generates 30 bank lines and 35 ledger items. They're built to break simple tools: split payments,
+Stripe payouts with fees taken off, 2% TDS short-payments, `AMZN` vs `Amazon`, `MEHTA AND SONS` vs `Mehta & Sons`,
+two open items with the same amount, a duplicated bank line, and items that should stay open.
+
+| Mode | Matches found | Wrong matches | Auto-matched (all correct) | LLM calls |
+|---|---|---|---|---|
+| Offline heuristics | **27 / 27** | 0 | 24 | 0 |
+| Groq `openai/gpt-oss-120b` | **27 / 27** | 0 | 24 | 4 |
+
+With an LLM, the judge explains each difference, e.g. *"The 200 difference (2%) matches typical TDS deduction"*.
+After you approve one Stripe payout with **Approve and learn a rule**, the next run matches every Stripe payout automatically.
+
+## 🚀 Quick start
 
 ```powershell
 pip install -r requirements.txt
-python data\make_sample.py        # made-up test data with the tricky cases
-python run.py                     # CLI run, scored against data\sample\truth.csv
+python data\make_sample.py                 # made-up test data with the tricky cases
+python run.py                              # CLI run, scored against data\sample\truth.csv
 
 cd web; npm install; npm run build; cd ..
-python -m uvicorn api:app --port 8000   # API + React review screen at http://localhost:8000
+python -m uvicorn api:app --port 8000      # API + React app at http://localhost:8000
 ```
 
-For frontend work, run `npm run dev` in `web/` (port 5173, proxies `/api` to port 8000) next to the uvicorn server.
+For frontend work, run `npm run dev` in `web/` (port 5173, proxies `/api` to 8000) next to uvicorn.
 
-Sample results (30 bank lines, 35 ledger items): 27/27 matches found, 0 wrong, 24 auto-matched.
-With Groq (`openai/gpt-oss-120b`) that took 4 LLM calls, and the judge explains fee and TDS differences.
+## 🤖 LLM providers (free options)
 
-## LLM providers (free options)
+Copy `.env.example` to `.env` and set `RECON_PROVIDER` plus the key for the provider you use.
 
 | Provider | Setup | Notes |
 |---|---|---|
 | `none` | nothing | offline heuristics |
-| `ollama` | install Ollama, `ollama pull qwen2.5:7b` | runs on your PC; use this for real financial data |
-| `groq` | `GROQ_API_KEY` in `.env` | fast; default model `openai/gpt-oss-120b`; free tier is rate-limited per model |
-| `gemini` | `GEMINI_API_KEY` in `.env` | free tier may use prompts for training |
-| `openrouter` | `OPENROUTER_API_KEY` in `.env` | `:free` models, about 50 requests a day |
+| `ollama` | `ollama pull qwen2.5:7b` | runs on your PC; **use this for real financial data** |
+| `groq` | `GROQ_API_KEY` | fast; default `openai/gpt-oss-120b` |
+| `gemini` | `GEMINI_API_KEY` | free tier may use prompts for training |
+| `openrouter` | `OPENROUTER_API_KEY` | `:free` models, about 50 requests a day |
 
-Copy `.env.example` to `.env`. Free cloud tiers can train on your prompts, so send them sample or
-anonymised data only.
+> ⚠️ Free cloud tiers may train on your prompts. Send them sample or anonymised data only.
 
-## Your own files
+Every LLM answer is cached in SQLite, so re-running the same data costs nothing. If a call fails, that step falls back to the heuristics.
 
-The bank file needs date, description and either amount or credit/debit columns. The ledger needs
-date, party and amount, plus optional doc_no and type (rows typed bill or payable count as money out).
-Common column names (narration, particulars, withdrawal, customer, vendor, invoice no...) are
-recognised automatically.
+## 📁 Your own files
 
-## Layout
+**Bank file:** date, description, and either amount or credit/debit columns.
+**Ledger:** date, party and amount, plus optional `doc_no` and `type` (rows typed *bill* or *payable* count as money out).
+Common column names (narration, particulars, withdrawal, customer, vendor, invoice no…) are recognised automatically.
+
+## 🗂️ Project layout
 
 ```
 api.py            FastAPI: runs the pipeline, review actions, rules, audit, export
 web/              React (Vite) review screen
-run.py            CLI + scoring
-core/ingest.py    parsing and normalising
+run.py            CLI + scoring against the answer key
+core/ingest.py    parsing and normalising (integer paise)
 core/rules.py     layer 1 + learned rules
-core/extract.py   layer 2
-core/fuzzy.py     layer 3
-core/solver.py    layer 4
-core/judge.py     layer 5
-core/learner.py   corrections -> rules
+core/extract.py   layer 2: LLM field extraction
+core/fuzzy.py     layer 3: name similarity (+ optional local embeddings)
+core/solver.py    layer 4: split payments / subset sum
+core/judge.py     layer 5: LLM judge
+core/learner.py   corrections → rules (regex safety-checked)
 core/summary.py   month-end note
-core/store.py     SQLite: rules, audit, LLM cache
+core/store.py     SQLite: rules, audit log, LLM cache
 llm/gateway.py    one client for Ollama / Groq / Gemini / OpenRouter
 ```

@@ -213,4 +213,4 @@ if DIST.exists():
 
     @app.get("/")
     def index():
-        return FileResponse(DIST / "index.html")
+        return FileResponse(DIST / "index.html", headers={"Cache-Control": "no-cache"})
