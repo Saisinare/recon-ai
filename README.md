@@ -13,6 +13,9 @@ and **every correction you make becomes a reusable rule**.
 ![Groq](https://img.shields.io/badge/LLM-Groq%20·%20Gemini%20·%20Ollama-c8f169?style=flat-square)
 ![Accuracy](https://img.shields.io/badge/sample%20set-27%2F27%20matched%20·%200%20wrong-c8f169?style=flat-square)
 
+### [▶ Live demo: recon-ai-t7oo.onrender.com](https://recon-ai-t7oo.onrender.com)
+<sub>Free hosting: if it has been idle, the first load takes 30–60 seconds to wake up.</sub>
+
 <img src="docs/screenshots/02-hero-results.png" alt="Recon AI home screen with a finished run" width="100%" />
 
 </div>
