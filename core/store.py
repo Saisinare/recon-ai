@@ -19,8 +19,12 @@ CREATE TABLE IF NOT EXISTS llm_cache(key TEXT PRIMARY KEY, value TEXT);
 
 
 class Store:
-    def __init__(self, path="recon.db"):
+    """path=':memory:' gives a private store (used per visitor in demo mode).
+    cache=<another Store> shares the LLM cache so repeated text is never re-sent."""
+
+    def __init__(self, path="recon.db", cache=None):
         self.path = path
+        self.cache = cache
         self.lock = threading.Lock()
         self.db = sqlite3.connect(path, check_same_thread=False)
         self.db.row_factory = sqlite3.Row
@@ -34,10 +38,14 @@ class Store:
 
     # cache
     def cache_get(self, key):
+        if self.cache:
+            return self.cache.cache_get(key)
         r = self._x("SELECT value FROM llm_cache WHERE key=?", (key,)).fetchone()
         return json.loads(r["value"]) if r else None
 
     def cache_put(self, key, value):
+        if self.cache:
+            return self.cache.cache_put(key, value)
         self._x("INSERT OR REPLACE INTO llm_cache VALUES(?,?)", (key, json.dumps(value)))
 
     # rules

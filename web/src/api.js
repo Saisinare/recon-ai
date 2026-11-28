@@ -10,6 +10,7 @@ const post = (path, data) =>
   call(path, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data ?? {}) });
 
 export const api = {
+  config: () => call("/config"),
   providers: () => call("/providers"),
   state: () => call("/state"),
   run: (form) => call("/run", { method: "POST", body: form }),

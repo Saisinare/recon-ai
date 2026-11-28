@@ -25,6 +25,7 @@ export default function App() {
   const [tab, setTabState] = useState(tabFromHash);
   const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState(null);
+  const [config, setConfig] = useState({ demo: false });
 
   const setTab = (id) => {
     setTabState(id);
@@ -53,6 +54,7 @@ export default function App() {
       if (ready) setSettings((s) => ({ ...s, provider: ready.name }));
     }).catch(() => {});
     api.state().then(setData).catch(() => {});
+    api.config().then(setConfig).catch(() => {});
     const onHash = () => setTabState(tabFromHash());
     window.addEventListener("hashchange", onHash);
     return () => window.removeEventListener("hashchange", onHash);
@@ -73,7 +75,8 @@ export default function App() {
       }
       const s = await api.run(f);
       setData(s);
-      if (s.llm?.errors?.length) notify(`Some LLM calls failed; heuristics filled in. ${s.llm.errors.at(-1)}`, "error");
+      if (s.notice) notify(s.notice);
+      else if (s.llm?.errors?.length) notify(`Some LLM calls failed; heuristics filled in. ${s.llm.errors.at(-1)}`, "error");
       setTimeout(() => document.getElementById("overview")?.scrollIntoView({ behavior: "smooth" }), 50);
     });
 
@@ -96,7 +99,7 @@ export default function App() {
   return (
     <div className="page">
       <Nav tabs={TABS} tab={tab} setTab={setTab} ready={data.ready} reviewCount={reviewCount} run={run} busy={busy} />
-      <Hero {...{ providers, settings, setSettings, files, setFiles, run, busy, data }} />
+      <Hero {...{ providers, settings, setSettings, files, setFiles, run, busy, data, config }} />
 
       {data.ready && <Overview s={data.stats} llm={data.llm} />}
 

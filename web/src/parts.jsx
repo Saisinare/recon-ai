@@ -44,7 +44,7 @@ export function SectionHead({ tag, title, sub }) {
   );
 }
 
-export function Hero({ providers, settings, setSettings, files, setFiles, run, busy, data }) {
+export function Hero({ providers, settings, setSettings, files, setFiles, run, busy, data, config }) {
   const s = data.ready ? data.stats : null;
   return (
     <section className="hero">
@@ -73,7 +73,7 @@ export function Hero({ providers, settings, setSettings, files, setFiles, run, b
           </div>
         )}
       </div>
-      <Settings {...{ providers, settings, setSettings, files, setFiles, run, busy }} />
+      <Settings {...{ providers, settings, setSettings, files, setFiles, run, busy, config }} />
     </section>
   );
 }
@@ -94,7 +94,7 @@ function Bars({ byLayer }) {
   );
 }
 
-function Settings({ providers, settings, setSettings, files, setFiles, run, busy }) {
+function Settings({ providers, settings, setSettings, files, setFiles, run, busy, config }) {
   const set = (k) => (e) => setSettings({ ...settings, [k]: e.target.type === "checkbox" ? e.target.checked : e.target.value });
   const p = providers.find((x) => x.name === settings.provider);
   const cloud = ["groq", "gemini", "openrouter"].includes(settings.provider);
@@ -127,15 +127,23 @@ function Settings({ providers, settings, setSettings, files, setFiles, run, busy
         </label>
       </div>
       {p && <div className={`status ${p.available ? "ok" : "warn"}`}><span className="dot" />{p.status}</div>}
-      {cloud && <p className="hint">Free tiers may use prompts for training. Send sample or anonymised data only.</p>}
+      {cloud && !config.demo && <p className="hint">Free tiers may use prompts for training. Send sample or anonymised data only.</p>}
       <label>
         <span className="between">Auto-match threshold <b>{Number(settings.threshold).toFixed(2)}</b></span>
         <input type="range" min="0.5" max="0.99" step="0.01" value={settings.threshold} onChange={set("threshold")} />
       </label>
-      <label className="check">
-        <input type="checkbox" checked={settings.embeddings} onChange={set("embeddings")} />
-        Local embeddings for names
-      </label>
+      {!config.demo && (
+        <label className="check">
+          <input type="checkbox" checked={settings.embeddings} onChange={set("embeddings")} />
+          Local embeddings for names
+        </label>
+      )}
+      {config.demo && (
+        <p className="demo-note">
+          <b>Public demo.</b> {config.llm_runs_per_hour} LLM runs per hour. Uploads (up to {config.max_upload_kb} KB) are matched
+          offline and never sent to an LLM. Your results stay in memory for 2 hours and aren't shared with other visitors.
+        </p>
+      )}
       <button className="btn lime wide" onClick={run} disabled={busy}>{busy ? "Working…" : "Run reconciliation"}</button>
     </div>
   );

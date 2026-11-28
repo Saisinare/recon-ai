@@ -1,0 +1,17 @@
+# Render Blueprint: New -> Blueprint -> pick this repo. Free plan, built from the Dockerfile.
+services:
+  - type: web
+    name: recon-ai
+    runtime: docker
+    plan: free
+    healthCheckPath: /api/health
+    autoDeploy: true
+    envVars:
+      - key: RECON_DEMO          # per-visitor sessions, LLM rate limit, uploads matched offline
+        value: "1"
+      - key: RECON_PROVIDER
+        value: groq
+      - key: RECON_DEMO_LLM_RUNS # cloud-LLM runs per visitor IP per hour
+        value: "5"
+      - key: GROQ_API_KEY        # Render asks you for this when you create the Blueprint
+        sync: false

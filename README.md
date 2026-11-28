@@ -100,6 +100,24 @@ python -m uvicorn api:app --port 8000      # API + React app at http://localhost
 
 For frontend work, run `npm run dev` in `web/` (port 5173, proxies `/api` to 8000) next to uvicorn.
 
+## ☁️ Deploy for free (Render)
+
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/Saisinare/recon-ai)
+
+The repo has a `Dockerfile` and a `render.yaml` Blueprint, so it runs on Render's free plan:
+
+1. Sign in at [render.com](https://render.com) with GitHub, then **New → Blueprint** and pick this repo (or use the button above).
+2. Paste your `GROQ_API_KEY` when Render asks for it, then **Apply**.
+3. Your app is live at `https://recon-ai-xxxx.onrender.com` after the first build (about 5 minutes).
+
+The Blueprint turns on **public demo mode** (`RECON_DEMO=1`):
+- every visitor gets their own private session; no one sees anyone else's run, rules or audit log
+- 5 Groq runs per visitor per hour (`RECON_DEMO_LLM_RUNS`), then the offline heuristics take over
+- uploads are capped at 1 MB / 3,000 rows and always matched offline, never sent to an LLM
+
+Free-plan caveats: the service sleeps after ~15 minutes idle (the first visit takes 30–60 s to wake it), and there's no
+lasting disk, so learned rules and the audit log reset when it restarts.
+
 ## 🤖 LLM providers (free options)
 
 Copy `.env.example` to `.env` and set `RECON_PROVIDER` plus the key for the provider you use.
